@@ -9,7 +9,7 @@ related to the initial configuration of lab build out.
 
 ### KEY NOTES ###
 Vagrant VMs use 2CPUS and 4G of RAM per VM  
-Disk size for the servers is set as a default by the Vagrantfile.  
+Disk size for the servers is set as a default by the robox vm.  
 Controller.yml configures the controller server to be a dhcp/tftp server.  With additonal configuration it can be a kickstart server.  
 Controller.yml also creates a basic Ansible inventory for testing with the 3 clients.  
 clients.yml configures the clients to use eth1 with a static IP for testing.
