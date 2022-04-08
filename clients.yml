@@ -1,0 +1,56 @@
+---
+- hosts: all
+  gather_facts: True
+  become: True
+  tasks:
+     - name: Modify /etc/sshd/sshd_config to disallow password login
+       ansible.builtin.lineinfile:
+            path: /etc/ssh/sshd_config
+            regexp: '^#PasswordAuthentication(.*)$'
+            line: 'PasswordAuthentication yes'
+
+     - name: remove symlink for virtualboxes
+       ansible.builtin.file: 
+           path: /etc/localtime
+           state: absent
+       
+     - name: Set timezone for server
+       ansible.builtin.timezone: 
+         name: America/New_York
+
+     - name: install firewalld
+       ansible.builtin.package:
+           name: firewalld
+           
+     - name: Enable firewalld
+       ansible.builtin.systemd:
+            name: firewalld
+            state: started
+
+     - name: Enable and restart sshd
+       ansible.builtin.systemd:
+           name: sshd
+           state: restarted
+
+     - name: create /etc/sysconfig/network-scripts file
+       ansible.builtin.copy:
+          content: |
+             DEVICE="eth1"
+             BOOTPROTO=none
+             ONBOOT="yes"
+             TYPE=Ethernet
+             IPADDR="{% if ansible_distribution == 'Rocky' %}192.168.80.21{% elif ansible_distribution == 'RedHat' and aansible_distribution_major_version|int == 7 %}192.168.80.22{% elif ansible_distribution == 'RedHat' and aansible_distribution_major_version|int == 8 %}192.168.80.23{% else %}192.168.80.24{% endif %}"
+             NETMASK=255.255.255.0
+             IPV6=no
+             DEFROUTE=no
+
+          dest:  /etc/sysconfig/network-scripts/ifcfg-eth1
+          owner: root
+          group: root
+          mode: 0644
+
+     - name: 
+       ansible.builtin.systemd:
+          name: NetworkManager
+          state: restarted
+       
