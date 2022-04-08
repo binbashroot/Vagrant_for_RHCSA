@@ -58,7 +58,7 @@ File > Preferences > Network > New Network (this will create a new NatNetwork
     - Linux:  /opt/vagrant/Vagrantfile  
     
 9. **Edit the Vagrantfile**  
-    Update "serverb" and "serverc" with your redhat login credentials.  **Be aware........your credentials will be in plain text**
+    Update "serverb" and "serverc" with your redhat login credentials.  **Be aware........your credentials will be in plain text**  
     You can opt out of this by removing the following lines from the vagrantfile for both serverb AND serverc.  
   
  
