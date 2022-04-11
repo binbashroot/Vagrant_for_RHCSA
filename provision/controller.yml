@@ -1,0 +1,225 @@
+---
+- hosts: all
+  gather_facts: True
+  become: True
+  tasks:
+     - name: Modify /etc/sshd/sshd_config to disallow password login
+       lineinfile:
+            path: /etc/ssh/sshd_config
+            regexp: '^#PasswordAuthentication(.*)$'
+            line: 'PasswordAuthentication yes'
+
+     - name: Enable firewalld
+       systemd:
+            name: firewalld
+            state: started
+
+     - name: Add core packages to be a tftp server
+       ansible.builtin.package:
+         name: "{{ packages }}"
+         state: latest
+       vars:
+          packages:
+              - git
+              - httpd
+              - syslinux-tftpboot
+              - tftp-server
+              - bind-utils
+              - wget
+              - dhcp-server
+              - mlocate
+              
+     - name: remove symlink for virtualboxes
+       ansible.builtin.file: 
+           path: /etc/localtime
+           state: absent         
+     
+     - name: Set timezone for server
+       timezone: 
+         name: America/New_York
+
+     - name: enable tftp port
+       firewalld:
+             service:  "{{ item }}"
+             permanent: yes
+             state: enabled
+             immediate: yes
+       loop: 
+          - dhcp
+          - tftp    
+          
+     - name: create ifcfg-eth1 file
+       copy: 
+          content: |
+              NAME=eth1
+              DEVICE=eth1
+              BOOTPROTO=none
+              ONBOOT=yes
+              TYPE=Ethernet
+              IPADDR=192.168.80.3
+              GATEWAY=192.168.80.2
+              NETMASK=255.255.255.0
+              #DNS1=192.168.80.2
+              IPV6=no
+          dest:  /etc/sysconfig/network-scripts/ifcfg-eth1
+          owner: root
+          group: root
+          mode: 0644
+      
+     - name: Enable vagrant machine to be a router for hosts on 192.168.80.0 network
+       sysctl:
+              name: "{{ item }}"
+              value: '1'
+              sysctl_set: True
+       loop:
+         - net.ipv6.conf.all.disable_ipv6
+         - net.ipv6.conf.default.disable_ipv6       
+         - net.ipv4.ip_forward    
+
+     - name: restart eth1
+       command: ifup eth1
+       
+       
+     - name: Create dhpd.conf to serve dhcp on 192.168.80.0 Network
+       copy:
+            content: |
+                option space pxelinux;
+                option pxelinux.magic code 208 = string;
+                option pxelinux.configfile code 209 = text;
+                option pxelinux.pathprefix code 210 = text;
+                option pxelinux.reboottime code 211 = unsigned integer 32;
+                option architecture-type code 93 = unsigned integer 16;
+                default-lease-time 600;
+                max-lease-time 1200;
+                subnet 10.0.2.0 netmask 255.255.255.0 {}
+                subnet 192.168.80.0 netmask 255.255.255.0 {
+                        option routers 192.168.80.2;
+                        option domain-name-servers 192.168.1.1;
+                        range 192.168.80.21 192.168.80.23;
+                        class "pxeclients" {
+                          match if substring (option vendor-class-identifier, 0, 9) = "PXEClient";
+                          next-server 192.168.80.3;
+                          if option architecture-type = 00:07 {
+                            filename "uefi/shim.efi";
+                            } else {
+                            filename "pxelinux/pxelinux.0";
+                            } } }
+            dest: /etc/dhcp/dhcpd.conf
+            owner: root
+            group: root
+            mode: 0644
+          
+     - name: start tftp server
+       systemd:
+            name: tftp.socket
+            enabled: yes
+            state: started
+           
+     - name: Enable and restart dhcpd
+       systemd:
+           name: dhcpd
+           enabled: yes
+           state: restarted
+                
+
+     - name: Enable and restart dhcpd
+       systemd:
+           name: sshd
+           state: restarted
+       
+     - name: restart sshd
+       command: systemctl restart dhcpd
+       
+     - name: create Ansible lab directory
+       file:
+          path: "/home/vagrant/ansible/group_vars/{{ item }}"
+          state: directory
+          owner: vagrant
+          group: vagrant
+          mode: 0755
+       loop:
+           - all
+           - dev
+           - uat
+           - prod
+           
+     - name: create Ansible lab vars.yml
+       file:
+          path: "/home/vagrant/ansible/group_vars/{{ item }}/vars.yml"
+          state: touch
+          owner: vagrant
+          group: vagrant
+          mode: 0755
+       loop:
+           - all
+           - dev
+           - uat
+           - prod
+           
+     - name: add entries to group_vars/all/vars.yml file
+       copy:
+           content: |
+              ansible_user: vagrant
+              ansible_password: vagrant
+
+           dest: /home/vagrant/ansible/group_vars/all/vars.yml
+           owner: vagrant
+           group: vagrant
+           mode: 0644
+
+     - name: create lab inventory file
+       copy: 
+          content: |
+              [dev]
+              servera
+
+              [uat]
+              serverb
+
+              [prod]
+              serverc
+
+          dest: /home/vagrant/ansible/inventory
+          owner: vagrant
+          group: vagrant
+          mode: 0644
+
+     - name: create lab ansible.cfg file
+       copy: 
+          content: |
+              [defaults]
+              inventory = inventory 
+              gathering = explicit 
+              host_key_checking = false 
+
+              [ssh_connection] 
+              ssh_args = -C -o ControlMaster=auto -o ControlPersist=60s -o UserKnownHostsFile=/dev/null 
+
+          dest: /home/vagrant/ansible/ansible.cfg
+          owner: vagrant
+          group: vagrant
+          mode: 0644
+
+     - name: create host_vars dir
+       file:
+          path: /home/vagrant/ansible/host_vars
+          state: directory
+          owner: vagrant
+          group: vagrant
+          mode: 0755
+
+     - name: create host_vars vars files
+       copy: 
+          content: |
+              ansible_host: {{ item.ipaddr }}
+          dest: "/home/vagrant/ansible/host_vars/{{ item.host }}.yml"
+          owner: vagrant
+          group: vagrant
+          mode: 0644
+       loop:
+          - { host: servera, ipaddr: 192.168.80.21 }
+          - { host: serverb, ipaddr: 192.168.80.22 }
+          - { host: serverc, ipaddr: 192.168.80.23 }
+
+   
+   
