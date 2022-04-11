@@ -56,7 +56,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    
    config.vm.define "servera" do |servera|
       servera.vm.box = "roboxes/rocky8"
-      servera.vm.network "private_network", ip: "192.168.80.20",
+      servera.vm.network "private_network", ip: "192.168.80.21",
          virtualbox__intnet: "ClientNetwork"
       servera.vm.provider :virtualbox do |vb|
          vb.name = "servera"
@@ -76,7 +76,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    config.vm.define "serverb" do |serverb|
       serverb.vm.box = "roboxes/rhel7"
-      serverb.vm.network "private_network", ip: "192.168.80.30",
+      serverb.vm.network "private_network", ip: "192.168.80.22",
          virtualbox__intnet: "ClientNetwork"
       serverb.vm.provider :virtualbox do |vb|
          vb.name = "serverb"
@@ -105,7 +105,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    config.vm.define "serverc" do |serverc|
       serverc.vm.box = "roboxes/rhel8"
-      serverc.vm.network "private_network", ip: "192.168.80.40",
+      serverc.vm.network "private_network", ip: "192.168.80.23",
          virtualbox__intnet: "ClientNetwork"
       serverc.vm.provider :virtualbox do |vb|
          vb.name = "serverc"

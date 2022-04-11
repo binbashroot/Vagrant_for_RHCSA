@@ -39,7 +39,7 @@
              BOOTPROTO=none
              ONBOOT="yes"
              TYPE=Ethernet
-             IPADDR="{% if ansible_distribution == 'Rocky' %}192.168.80.21{% elif ansible_distribution == 'RedHat' and aansible_distribution_major_version|int == 7 %}192.168.80.22{% elif ansible_distribution == 'RedHat' and aansible_distribution_major_version|int == 8 %}192.168.80.23{% else %}192.168.80.24{% endif %}"
+             IPADDR="{% if ansible_distribution == 'Rocky' %}192.168.80.21{% elif ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 7 %}192.168.80.22{% elif ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 8 %}192.168.80.23{% else %}192.168.80.24{% endif %}"
              NETMASK=255.255.255.0
              IPV6=no
              DEFROUTE=no
