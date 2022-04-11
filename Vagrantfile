@@ -46,15 +46,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    controller.ssh.insert_key = false
 	controller.vm.synced_folder "provision/", "/vagrant/provision"
-   controller.vm.provision "ansible_local" do |ansible|
-      ansible.playbook = "provision/controller.yml"
-      ansible.install_mode ="pip3"
-      ansible.verbose = true
+      controller.vm.provision "ansible_local" do |ansible|
+         ansible.playbook = "provision/controller.yml"
+         ansible.install_mode ="pip3"
+         ansible.verbose = true
+      end
    end
-end
 
    
-config.vm.define "servera" do |servera|
+   config.vm.define "servera" do |servera|
       servera.vm.box = "roboxes/rocky8"
       servera.vm.network "private_network", ip: "192.168.80.20",
          virtualbox__intnet: "ClientNetwork"
@@ -74,63 +74,63 @@ config.vm.define "servera" do |servera|
       end
    end
 
-config.vm.define "serverb" do |serverb|
+   config.vm.define "serverb" do |serverb|
       serverb.vm.box = "roboxes/rhel7"
       serverb.vm.network "private_network", ip: "192.168.80.30",
          virtualbox__intnet: "ClientNetwork"
       serverb.vm.provider :virtualbox do |vb|
-             vb.name = "serverb"
-             vb.customize ["modifyvm", :id, "--memory", "4096"]
-             vb.customize ["modifyvm", :id, "--cpus", "2"]
- 		     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-             vb.customize ["modifyvm", :id, "--nic2", "natnetwork", "--nat-network2", "ClientNetwork"]
-         end
+         vb.name = "serverb"
+         vb.customize ["modifyvm", :id, "--memory", "4096"]
+         vb.customize ["modifyvm", :id, "--cpus", "2"]
+ 		   vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+         vb.customize ["modifyvm", :id, "--nic2", "natnetwork", "--nat-network2", "ClientNetwork"]
+      end
       serverb.trigger.before :destroy do |trigger|
          trigger.info = "Unregistering from Red Hat subscription"
          trigger.run_remote = {inline: unregister_script}
-         end
-	  serverb.vm.synced_folder "provision/", "/vagrant/provision"
-	  serverb.ssh.insert_key = false
-     serverb.vm.provision "shell", inline: register_script
+      end
+      serverb.vm.synced_folder "provision/", "/vagrant/provision"
+      serverb.ssh.insert_key = false
+      serverb.vm.provision "shell", inline: register_script
       serverb.vm.provision "ansible_local" do |ansible|
          ansible.playbook = "provision/clients.yml"
-         end
+      end
 	  
-	  serverb.vm.provision "shell",
+	   serverb.vm.provision "shell",
 		  reboot: true,
 		  inline:  'echo  Rebooting'
 		serverb.vm.provision "shell",
 		  inline:  'echo Reboot Completed'
 	end
 
-config.vm.define "serverc" do |serverc|
+   config.vm.define "serverc" do |serverc|
       serverc.vm.box = "roboxes/rhel8"
       serverc.vm.network "private_network", ip: "192.168.80.40",
          virtualbox__intnet: "ClientNetwork"
       serverc.vm.provider :virtualbox do |vb|
-             vb.name = "serverc"
-             vb.customize ["modifyvm", :id, "--memory", "4096"]
-             vb.customize ["modifyvm", :id, "--cpus", "2"]
- 		     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-             vb.customize ["modifyvm", :id, "--nic2", "natnetwork", "--nat-network2", "ClientNetwork"]
-         end
+         vb.name = "serverc"
+         vb.customize ["modifyvm", :id, "--memory", "4096"]
+         vb.customize ["modifyvm", :id, "--cpus", "2"]
+         vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+         vb.customize ["modifyvm", :id, "--nic2", "natnetwork", "--nat-network2", "ClientNetwork"]
+      end
       serverc.trigger.before :destroy do |trigger|
          trigger.info = "Unregistering from Red Hat subscription"
          trigger.run_remote = {inline: unregister_script}
-         end
-	  serverc.vm.synced_folder "provision/", "/vagrant/provision"
-	  serverc.ssh.insert_key = false
-     serverc.vm.provision "shell", inline: register_script
+      end
+      serverc.vm.synced_folder "provision/", "/vagrant/provision"
+      serverc.ssh.insert_key = false
+      serverc.vm.provision "shell", inline: register_script
       serverc.vm.provision "ansible_local" do |ansible|
          ansible.playbook = "provision/clients.yml"
          ansible.extra_vars = { ansible_python_interpreter:"/usr/bin/python3" }
-         end
+      end
 	  
-	  serverc.vm.provision "shell",
-		  reboot: true,
-		  inline:  'echo  Rebooting'
-	  serverc.vm.provision "shell",
-		  inline:  'echo Reboot Completed'
+	   serverc.vm.provision "shell",
+         reboot: true,
+         inline:  'echo  Rebooting'
+	   serverc.vm.provision "shell",
+		   inline:  'echo Reboot Completed'
 	end
 	
 end
