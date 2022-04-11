@@ -1,6 +1,24 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
+user = ENV['RH_SUBSCRIPTION_MANAGER_USER']
+password = ENV['RH_SUBSCRIPTION_MANAGER_PW']
+if !user or !password
+  puts 'Required environment variables not found. Please set RH_SUBSCRIPTION_MANAGER_USER and RH_SUBSCRIPTION_MANAGER_PW'
+  abort
+end
+
+register_script = %{
+if ! subscription-manager status; then
+  sudo subscription-manager register --username=#{user} --password=#{password} --auto-attach
+fi
+}
+
+unregister_script = %{
+if subscription-manager status; then
+  sudo subscription-manager unregister
+fi
+}
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
@@ -75,9 +93,9 @@ config.vm.define "serverb" do |serverb|
          end
 	  serverb.vm.synced_folder "provision/", "/vagrant/provision"
 	  serverb.ssh.insert_key = false
-	  serverb.vm.provision "shell", inline: <<-SHELL
-	     sudo subscription-manager register --username='YOUR_REDHAT_LOGIN_ID' --password='YOUR_REDHAT_LOGIN_PASSWORD'
-SHELL
+	  #serverb.vm.provision "shell", inline: <<-SHELL
+	      #sudo subscription-manager register --username='YOUR_REDHAT_LOGIN_ID' --password='YOUR_REDHAT_LOGIN_PASSWORD'
+#SHELL
       serverb.vm.provision "ansible_local" do |ansible|
          ansible.playbook = "provision/clients.yml"
          end
@@ -106,9 +124,9 @@ config.vm.define "serverc" do |serverc|
          end
 	  serverc.vm.synced_folder "provision/", "/vagrant/provision"
 	  serverc.ssh.insert_key = false
-	  serverc.vm.provision "shell", inline: <<-SHELL
-	     sudo subscription-manager register --username='YOUR_REDHAT_LOGIN_ID' --password='YOUR_REDHAT_LOGIN_PASSWORD'
-SHELL
+# 	  serverc.vm.provision "shell", inline: <<-SHELL
+# 	     sudo subscription-manager register --username='YOUR_REDHAT_LOGIN_ID' --password='YOUR_REDHAT_LOGIN_PASSWORD'
+# SHELL
       serverc.vm.provision "ansible_local" do |ansible|
          ansible.playbook = "provision/clients.yml"
          ansible.extra_vars = { ansible_python_interpreter:"/usr/bin/python3" }
