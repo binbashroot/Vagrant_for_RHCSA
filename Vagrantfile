@@ -1,6 +1,8 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
+# Setup subscription manager using environment variables to login with
+# This elimates hard coding passwords in the code
 user = ENV['RH_SUBSCRIPTION_MANAGER_USER']
 password = ENV['RH_SUBSCRIPTION_MANAGER_PW']
 if !user or !password
@@ -29,10 +31,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    ENV["LC_ALL"] = "en_US.UTF-8"
    ENV['LANG']="en_US.UTF-8" 
-
-   # config.vm.network "private_network", ip: "192.168.80.0",
-   #   virtualbox__intnet: "ClientNetwork"
-   # end
 
    config.vm.define "controller" do |controller|
       controller.vm.box = "roboxes/alma8"
@@ -89,13 +87,11 @@ config.vm.define "serverb" do |serverb|
          end
       serverb.trigger.before :destroy do |trigger|
          trigger.info = "Unregistering from Red Hat subscription"
-         trigger.run_remote = {inline: "sudo subscription-manager unregister"}
+         trigger.run_remote = {inline: unregister_script}
          end
 	  serverb.vm.synced_folder "provision/", "/vagrant/provision"
 	  serverb.ssh.insert_key = false
-	  #serverb.vm.provision "shell", inline: <<-SHELL
-	      #sudo subscription-manager register --username='YOUR_REDHAT_LOGIN_ID' --password='YOUR_REDHAT_LOGIN_PASSWORD'
-#SHELL
+     serverb.vm.provision "shell", inline: register_script
       serverb.vm.provision "ansible_local" do |ansible|
          ansible.playbook = "provision/clients.yml"
          end
@@ -120,13 +116,11 @@ config.vm.define "serverc" do |serverc|
          end
       serverc.trigger.before :destroy do |trigger|
          trigger.info = "Unregistering from Red Hat subscription"
-         trigger.run_remote = {inline: "sudo subscription-manager unregister"}
+         trigger.run_remote = {inline: unregister_script}
          end
 	  serverc.vm.synced_folder "provision/", "/vagrant/provision"
 	  serverc.ssh.insert_key = false
-# 	  serverc.vm.provision "shell", inline: <<-SHELL
-# 	     sudo subscription-manager register --username='YOUR_REDHAT_LOGIN_ID' --password='YOUR_REDHAT_LOGIN_PASSWORD'
-# SHELL
+     serverc.vm.provision "shell", inline: register_script
       serverc.vm.provision "ansible_local" do |ansible|
          ansible.playbook = "provision/clients.yml"
          ansible.extra_vars = { ansible_python_interpreter:"/usr/bin/python3" }
