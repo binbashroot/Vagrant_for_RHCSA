@@ -30,44 +30,33 @@ File > Preferences > Network > New Network (this will create a new NatNetwork
    Leave "Support DHCP" and "Supports IPv6" unchecked  
    Click OK  
 
-6. **Make a provision directory.**  
-    This directory should reside inside your Vagrant installation directory.   
-    This is where you will put your playbooks for the Ansible provisioner in Vagrant.   
-    Windows: mkdir C:\Hashicorp\Vagrant\provision  
-    Linux:   mkdir /opt/vagrant/provision  
+7. **Clone the Vagrant_for_RHCSA files from GitHub into your Hashicorp dir**  
 
-7. **Download files from GitHub**  
-    Note: Do not change the filenames  
-    - Vagrantfile  
-    - controller.yml  
-    - clients.yml    
+    *Windows Powershell (as Adminstrator)*
+    ```
+    cd C:\Hashicorp\Vagrant\
+    git clone git@github.com:binbashroot/Vagrant_for_RHCSA.git
+    cp -r Vagrant_for_RHSA/* .
+    rm -r -fo Vagrant_for_RHSA 
+    ```
     
-
-8. **Move Downloaded Files to proper location**
-
-    **## Should not need to do this anymore ##**
-
-    **##### clients.yml #####**  
-    - Windows: C:\Hashicorp\Vagrant\Vagrantfile\provision\clients.yml
-    - Linux:  /opt/vagrant/Vagrantfile/provision/clients.yml   
- 
-    **##### controller.yml #####**    
-    - Windows: C:\Hashicorp\Vagrant\Vagrantfile\provision\controller.yml
-    - Linux:  /opt/vagrant/Vagrantfile/provision/controller.yml  
+    *Linux (become root as needed)*
+    ```
+     cd /opt/vagrant
+     git clone git@github.com:binbashroot/Vagrant_for_RHCSA.git
+     cp -r Vagrant_for_RHSA/* .
+     rm -rf Vagrant_for_RHSA
+    ```
   
-    **##### Vagrantfile #####**  
-    - Windows: C:\Hashicorp\Vagrant\Vagrantfile    
-    - Linux:  /opt/vagrant/Vagrantfile  
-    
-9. **Set RHel Subscription User/PWD** 
-    export two environment variables to setup the subscription manager to use credentials:
+8. **Set RHel Subscription User/PWD**  
+    Export two environment variables to setup the subscription manager to use credentials:
 
     ```
     export RH_SUBSCRIPTION_MANAGER_USER=user@redhat.com
     export RH_SUBSCRIPTION_MANAGER_PW=passwordforuser
     ```
       
- 10. **Start vagrant**  
+9. **Start vagrant**  
      **##### Linux #####**  
      Open a terminal  (You may have to become root)  
      **Command:**  vagrant up   
