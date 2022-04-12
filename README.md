@@ -43,7 +43,9 @@ File > Preferences > Network > New Network (this will create a new NatNetwork
     - clients.yml    
     
 
-8. **Move Downloaded Files to proper location**    
+8. **Move Downloaded Files to proper location**
+
+    **## Should not need to do this anymore ##**
 
     **##### clients.yml #####**  
     - Windows: C:\Hashicorp\Vagrant\Vagrantfile\provision\clients.yml
@@ -57,17 +59,13 @@ File > Preferences > Network > New Network (this will create a new NatNetwork
     - Windows: C:\Hashicorp\Vagrant\Vagrantfile    
     - Linux:  /opt/vagrant/Vagrantfile  
     
-9. **Edit the Vagrantfile**  
-    Update "serverb" and "serverc" with your redhat login credentials.  **Be aware........your credentials will be in plain text**  
-    You can opt out of this by removing the following lines from the vagrantfile for both serverb AND serverc.  
-  
- 
- ```
-  ####Example for serverb:####  
-    serverb.vm.provision "shell", inline: <<-SHELL  
-	 sudo subscription-manager register --username='YOUR_REDHAT_LOGIN_ID' --password='YOUR_REDHAT_LOGIN_PASSWORD'  
-    SHELL
- ```  
+9. **Set RHel Subscription User/PWD** 
+    export two environment variables to setup the subscription manager to use credentials:
+
+    ```
+    export RH_SUBSCRIPTION_MANAGER_USER=user@redhat.com
+    export RH_SUBSCRIPTION_MANAGER_PW=passwordforuser
+    ```
       
  10. **Start vagrant**  
      **##### Linux #####**  
@@ -76,7 +74,7 @@ File > Preferences > Network > New Network (this will create a new NatNetwork
      
      
      **##### Windows #####**  
-     Open a Powershell window as Adminstrator   
+     Open a Powershell window as Administrator   
      **Command:**  vagrant up
        
     
