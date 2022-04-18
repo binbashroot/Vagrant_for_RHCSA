@@ -13,6 +13,9 @@ Disk size for the servers is set as a default by the robox vm.
 Controller.yml configures the controller server to be a dhcp/tftp server.  With additonal configuration it can be a kickstart server.  
 Controller.yml also creates a basic Ansible inventory for testing with the 3 clients.  
 clients.yml configures the clients to use eth1 with a static IP for testing.
+All vagrant boxes use defined ssh ports for host to guest access. 
+All vagrant boxes use defined IPs. 
+
   
 ### Instructions ###
 
@@ -52,8 +55,8 @@ File > Preferences > Network > New Network (this will create a new NatNetwork
     Export two environment variables to setup the subscription manager to use credentials:
 
     ```
-    export RH_SUBSCRIPTION_MANAGER_USER=user@redhat.com
-    export RH_SUBSCRIPTION_MANAGER_PW=passwordforuser
+    export RHSM_USER=user@redhat.com
+    export RHSM_PASS=passwordforuser
     ```
       
 9. **Start vagrant**  
