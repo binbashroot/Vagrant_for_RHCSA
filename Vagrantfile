@@ -3,10 +3,10 @@ VAGRANTFILE_API_VERSION = "2"
 
 # Setup subscription manager using environment variables to login with
 # This elimates hard coding passwords in the code
-user = ENV['RH_SUBSCRIPTION_MANAGER_USER']
-password = ENV['RH_SUBSCRIPTION_MANAGER_PW']
+user = ENV['RHSM_USER']
+password = ENV['RHSM_PASS']
 if !user or !password
-  puts 'Required environment variables not found. Please set RH_SUBSCRIPTION_MANAGER_USER and RH_SUBSCRIPTION_MANAGER_PW'
+  puts 'Required environment variables not found. Please set RHSM_USER and RHSM_PASS'
   abort
 end
 
@@ -34,8 +34,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    config.vm.define "controller" do |controller|
       controller.vm.box = "roboxes/alma8"
+      controller.vm.hostname = "controller.localdomain"
       controller.vm.network "private_network", ip: "192.168.80.10",
          virtualbox__intnet: "ClientNetwork"
+      controller.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2222
       controller.vm.provider :virtualbox do |vb|
          vb.name = "controller"
          vb.customize ["modifyvm", :id, "--memory", "4096"]
@@ -56,8 +58,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    
    config.vm.define "servera" do |servera|
       servera.vm.box = "roboxes/rocky8"
+      servera.vm.hostname = "servera.localdomain"
       servera.vm.network "private_network", ip: "192.168.80.21",
          virtualbox__intnet: "ClientNetwork"
+      servera.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2201
       servera.vm.provider :virtualbox do |vb|
          vb.name = "servera"
          vb.customize ["modifyvm", :id, "--memory", "4096"]
@@ -76,8 +80,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    config.vm.define "serverb" do |serverb|
       serverb.vm.box = "roboxes/rhel7"
+      serverb.vm.hostname = "serverb.localdomain"
       serverb.vm.network "private_network", ip: "192.168.80.22",
          virtualbox__intnet: "ClientNetwork"
+      serverb.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2202
       serverb.vm.provider :virtualbox do |vb|
          vb.name = "serverb"
          vb.customize ["modifyvm", :id, "--memory", "4096"]
@@ -105,8 +111,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    config.vm.define "serverc" do |serverc|
       serverc.vm.box = "roboxes/rhel8"
+      serverc.vm.hostname = "serverc.localdomain"
       serverc.vm.network "private_network", ip: "192.168.80.23",
          virtualbox__intnet: "ClientNetwork"
+      serverc.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2203
       serverc.vm.provider :virtualbox do |vb|
          vb.name = "serverc"
          vb.customize ["modifyvm", :id, "--memory", "4096"]
