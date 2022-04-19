@@ -34,7 +34,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    config.vm.define "controller" do |controller|
       controller.vm.box = "roboxes/alma8"
-      controller.vm.hostname = "controller"
+      controller.vm.hostname = "controller.localdomain"
       controller.vm.network "private_network", ip: "192.168.80.10",
          virtualbox__intnet: "ClientNetwork"
       controller.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2222
@@ -58,7 +58,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    
    config.vm.define "servera" do |servera|
       servera.vm.box = "roboxes/rocky8"
-      servera.vm.hostname = "servera"
+      servera.vm.hostname = "servera.localdomain"
       servera.vm.network "private_network", ip: "192.168.80.21",
          virtualbox__intnet: "ClientNetwork"
       servera.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2201
@@ -80,7 +80,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    config.vm.define "serverb" do |serverb|
       serverb.vm.box = "roboxes/rhel7"
-      serverb.vm.hostname = "serverb"
+      serverb.vm.hostname = "serverb.localdomain"
       serverb.vm.network "private_network", ip: "192.168.80.22",
          virtualbox__intnet: "ClientNetwork"
       serverb.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2202
@@ -111,7 +111,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    config.vm.define "serverc" do |serverc|
       serverc.vm.box = "roboxes/rhel8"
-      serverc.vm.hostname = "serverc"
+      serverc.vm.hostname = "serverc.localdomain"
       serverc.vm.network "private_network", ip: "192.168.80.23",
          virtualbox__intnet: "ClientNetwork"
       serverc.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2203
