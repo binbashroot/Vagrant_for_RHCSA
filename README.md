@@ -55,18 +55,23 @@ File > Preferences > Network > New Network (this will create a new NatNetwork
     Export two environment variables to setup the subscription manager to use credentials:
 
     ```
+    Windows Powershell:
+    $env:RHSM_USER = "user@redhat.com"
+    $env:RHSM_PASS = "passwordforuser"
+
+    Linux:
     export RHSM_USER=user@redhat.com
     export RHSM_PASS=passwordforuser
     ```
       
 9. **Start vagrant**  
      **##### Linux #####**  
-     Open a terminal  (You may have to become root)  
+     (You may have to become root)  
      **Command:**  vagrant up   
      
      
      **##### Windows #####**  
-     Open a Powershell window as Administrator   
+     (You may need to run as Administrator)  
      **Command:**  vagrant up
        
     
