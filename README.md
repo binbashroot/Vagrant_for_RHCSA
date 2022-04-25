@@ -39,16 +39,16 @@ File > Preferences > Network > New Network (this will create a new NatNetwork
     ```
     cd C:\Hashicorp\Vagrant\
     git clone git@github.com:binbashroot/Vagrant_for_RHCSA.git
-    cp -r Vagrant_for_RHSA/* .
-    rm -r -fo Vagrant_for_RHSA 
+    cp -r Vagrant_for_RHCSA/* .
+    rm -r -fo Vagrant_for_RHCSA 
     ```
     
     *Linux (become root as needed)*
     ```
      cd /opt/vagrant
      git clone git@github.com:binbashroot/Vagrant_for_RHCSA.git
-     cp -r Vagrant_for_RHSA/* .
-     rm -rf Vagrant_for_RHSA
+     cp -r Vagrant_for_RHCSA/* .
+     rm -rf Vagrant_for_RHCSA
     ```
   
 8. **Set RHel Subscription User/PWD**  
