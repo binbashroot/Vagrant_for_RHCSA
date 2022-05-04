@@ -80,11 +80,23 @@ vagrant up
 9. **Start vagrant**  
      **##### Linux #####**  
      (You will only have to become root if you build in a system directory)  
-     **Command:**  vagrant up   
-     
+     **Command:**  
+     ```
+     vagrant up
+     ```
+
+     ### First time start **ONLY** ###
+     To enable extra storage for serverc for partitioning practice, run the following command **only** at provisioning time. Next time you bring the servers up the new drives will still exist:
+     **Command:** 
+     ```
+     VAGRANT_EXPERIMENTAL=disks vagrant up serverc
+     ```
      
      **##### Windows #####**  
      (You may need to run as Administrator)  
-     **Command:**  vagrant up
+     **Command:**  
+     ```
+     vagrant up
+     ```
        
     
