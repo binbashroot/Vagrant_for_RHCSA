@@ -37,7 +37,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       controller.vm.hostname = "controller.localdomain"
       controller.vm.network "private_network", ip: "192.168.80.10",
          virtualbox__intnet: "ClientNetwork"
-      controller.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2222
+      controller.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2250
       controller.vm.provider :virtualbox do |vb|
          vb.name = "controller"
          vb.customize ["modifyvm", :id, "--memory", "4096"]
@@ -115,6 +115,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       serverc.vm.network "private_network", ip: "192.168.80.23",
          virtualbox__intnet: "ClientNetwork"
       serverc.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2203
+
+      # Added second disk for practicing disk partitioning
+      # To add disk run vagrant up, once as described:
+      #
+      # Example: VAGRANT_EXPERIMENTAL=disks vagrant up serverc
+      serverc.vm.disk :disk, size: "250GB", name: "extra_storage"
+      
       serverc.vm.provider :virtualbox do |vb|
          vb.name = "serverc"
          vb.customize ["modifyvm", :id, "--memory", "4096"]
@@ -122,13 +129,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
          vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
          vb.customize ["modifyvm", :id, "--nic2", "natnetwork", "--nat-network2", "ClientNetwork"]
       end
+
       serverc.trigger.before :destroy do |trigger|
          trigger.info = "Unregistering from Red Hat subscription"
          trigger.run_remote = {inline: unregister_script}
       end
+
       serverc.vm.synced_folder "provision/", "/vagrant/provision"
       serverc.ssh.insert_key = false
       serverc.vm.provision "shell", inline: register_script
+
       serverc.vm.provision "ansible_local" do |ansible|
          ansible.playbook = "provision/clients.yml"
          ansible.extra_vars = { ansible_python_interpreter:"/usr/bin/python3" }
